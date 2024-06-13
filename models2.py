@@ -1,3 +1,7 @@
+"""
+[diff] means that there is a difference from [APNet2-official](https://github.com/redmist328/APNet2/tree/main)
+"""
+
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
@@ -73,13 +77,9 @@ class Generator(torch.nn.Module):
         self.ASP_num_kernels = len(h.ASP_resblock_kernel_sizes)
         self.PSP_num_kernels = len(h.PSP_resblock_kernel_sizes)
 
-        # self.ASP_input_conv = Conv1d(
-        #     h.num_mels,
-        #     h.ASP_channel,
-        #     h.ASP_input_conv_kernel_size,
-        #     1,
-        #     padding=get_padding(h.ASP_input_conv_kernel_size, 1),
-        # )
+        # [diff] No `ASP_input_conv`
+
+        # [diff] lint breaking
         self.PSP_input_conv = Conv1d(
             h.num_mels,
             h.PSP_channel,
@@ -88,13 +88,9 @@ class Generator(torch.nn.Module):
             padding=get_padding(h.PSP_input_conv_kernel_size, 1),
         )
 
-        # self.ASP_output_conv = Conv1d(
-        #     h.ASP_channel,
-        #     h.n_fft // 2 + 1,
-        #     h.ASP_output_conv_kernel_size,
-        #     1,
-        #     padding=get_padding(h.ASP_output_conv_kernel_size, 1),
-        # )
+        # [diff] No `ASP_output_conv`
+
+        # [diff] lint breaking
         self.PSP_output_R_conv = Conv1d(
             512,
             h.n_fft // 2 + 1,
@@ -131,13 +127,12 @@ class Generator(torch.nn.Module):
         self.convnext2 = nn.ModuleList(
             [
                 ConvNeXtBlock(
-                    dim=self.h.ASP_channel,
+                    dim=self.h.ASP_channel, # [diff] changed from `self.dim`
                     intermediate_dim=self.intermediate_dim,
                     layer_scale_init_value=layer_scale_init_value,
                     adanorm_num_embeddings=self.adanorm_num_embeddings,
                 )
-                # for _ in range(self.num_layers)
-                for _ in range(1)
+                for _ in range(1) # [diff] changed from `self.num_layers`
             ]
         )
         self.final_layer_norm = nn.LayerNorm(self.dim, eps=1e-6)
@@ -149,7 +144,8 @@ class Generator(torch.nn.Module):
             nn.init.trunc_normal_(m.weight, std=0.02)
             nn.init.constant_(m.bias, 0)
 
-    def forward(self, mel, inv_mel=None):
+    def forward(self, mel, inv_mel=None): # [diff] new argument `inv_mel`
+        # [diff] New amplitude prior module
         if inv_mel is None:
             inv_amp = (
                 inverse_mel(
@@ -167,13 +163,14 @@ class Generator(torch.nn.Module):
             )
         else:
             inv_amp = inv_mel
+
+        # [diff] No ASP prenet, just manual logarithm
         logamp = inv_amp.log()
-        # logamp = self.ASP_input_conv(logamp)
+
         for conv_block in self.convnext2:
             logamp = conv_block(logamp, cond_embedding_id=None)
-        # logamp = self.final_layer_norm2(logamp.transpose(1, 2))
-        # logamp = logamp.transpose(1, 2)
-        # logamp = self.ASP_output_conv(logamp)
+
+        # [diff] No ASP postnet
 
         pha = self.PSP_input_conv(mel)
         pha = self.norm(pha.transpose(1, 2))
