@@ -43,11 +43,13 @@ def spectral_de_normalize_torch(magnitudes):
     return output
 
 
-mel_window = {}
-inv_mel_window = {}
+# Caches
+mel_window = {} # Mel filters M & windows : dict[id, tuple[mel_basis, hann_window]]
+inv_mel_window = {} # pseudo-inverse Mel filters M+ : dict[id, inv_basis]
 
 
 def param_string(sampling_rate, n_fft, num_mels, fmin, fmax, win_size, device):
+    """Generate identifier based on parameters."""
     return f"{sampling_rate}-{n_fft}-{num_mels}-{fmin}-{fmax}-{win_size}-{device}"
 
 
@@ -103,21 +105,34 @@ def inverse_mel(
     fmax,
     in_dataset=False,
 ):
+    """
+    Estimate amplitude-spectrogram from mel-spectrogram with cached pseudo-inverse mel filter.
+    
+    Args:
+        mel - Source mel spectrogram X
+    """
+
     global inv_mel_window, mel_window
     device = torch.device("cpu") if in_dataset else mel.device
     ps = param_string(sampling_rate, n_fft, num_mels, fmin, fmax, win_size, device)
+    # inv_basis M+ found, use it
     if ps in inv_mel_window:
         inv_basis = inv_mel_window[ps]
+    # inv_basis M+ not found, make new one
     else:
+        # mel_window found, use it
         if ps in mel_window:
             mel_basis, _ = mel_window[ps]
+        # mel_window not found, make new ones
         else:
             mel_np = librosa_mel_fn(sampling_rate, n_fft, num_mels, fmin, fmax)
             mel_basis = torch.from_numpy(mel_np).float().to(device)
             hann_window = torch.hann_window(win_size).to(device)
             mel_window[ps] = (mel_basis.clone(), hann_window.clone())
+        # Make new inv_basis M+
         inv_basis = mel_basis.pinverse()
         inv_mel_window[ps] = inv_basis.clone()
+    # Estimate amplitude-spectrogram by "M+ @ X", equal to "lstsq(M, X).solution"
     return inv_basis.to(device) @ spectral_de_normalize_torch(mel.to(device))
 
 
