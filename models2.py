@@ -79,32 +79,15 @@ class Generator(torch.nn.Module):
 
         # [diff] No `ASP_input_conv`
 
-        # [diff] lint breaking
-        self.PSP_input_conv = Conv1d(
-            h.num_mels,
-            h.PSP_channel,
-            h.PSP_input_conv_kernel_size,
-            1,
-            padding=get_padding(h.PSP_input_conv_kernel_size, 1),
-        )
+        self.PSP_input_conv = Conv1d(h.num_mels, h.PSP_channel, h.PSP_input_conv_kernel_size, 1,
+                                                 padding=get_padding(h.PSP_input_conv_kernel_size, 1))
 
         # [diff] No `ASP_output_conv`
 
-        # [diff] lint breaking
-        self.PSP_output_R_conv = Conv1d(
-            512,
-            h.n_fft // 2 + 1,
-            h.PSP_output_R_conv_kernel_size,
-            1,
-            padding=get_padding(h.PSP_output_R_conv_kernel_size, 1),
-        )
-        self.PSP_output_I_conv = Conv1d(
-            512,
-            h.n_fft // 2 + 1,
-            h.PSP_output_I_conv_kernel_size,
-            1,
-            padding=get_padding(h.PSP_output_I_conv_kernel_size, 1),
-        )
+        self.PSP_output_R_conv = Conv1d(512, h.n_fft//2+1, h.PSP_output_R_conv_kernel_size, 1,
+                                                    padding=get_padding(h.PSP_output_R_conv_kernel_size, 1))
+        self.PSP_output_I_conv = Conv1d(512, h.n_fft//2+1, h.PSP_output_I_conv_kernel_size, 1,
+                                                    padding=get_padding(h.PSP_output_I_conv_kernel_size, 1))
 
         self.dim = 512
         self.num_layers = 8
