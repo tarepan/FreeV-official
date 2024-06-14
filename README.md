@@ -8,6 +8,8 @@
 
 Clone of the [official FreeV][officialRepository], mel-to-wave vocoders with Pseudo Inversed Mel Filter.
 
+![model](./figure/overall.png)
+
 One liner code:
 ```python
 model_input = mel_spec @ mel_filter.pinverse().abs().clamp_min(1e-5)
@@ -51,15 +53,6 @@ Modify the training and inference configuration by modifying the parameters in t
 Download pretrained model on LJSpeech dataset at [huggingface](https://huggingface.co/Bakerbunker/FreeV_Model_Logs).
 
 Modify the `inference.py` to inference.
-
-
-## Model Structure
-![model](./figure/overall.png)
-
-## Comparison with other models
-![compare](./figure/compare.png)
-
-![compare_table](./figure/compare_table.png)
 
 ## References
 ### Original paper <!-- omit in toc -->
