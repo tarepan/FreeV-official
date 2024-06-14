@@ -68,8 +68,6 @@ Eprint = {arXiv:2406.08196},
 ### Acknowlegements
 - [official APNet2](https://github.com/redmist328/APNet2)
 
-See the code changes at this [commit](https://github.com/BakerBunker/FreeV/commit/95e1e5cb3fe2b0360a30f39167e3e3ffd8097980)
-
 
 [ColabBadge]:https://colab.research.google.com/assets/colab-badge.svg
 
