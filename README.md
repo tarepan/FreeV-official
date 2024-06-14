@@ -30,14 +30,12 @@ pip install -r requirements.txt
 
 I tried using [PGHI(Phase Gradient Heap Integration)](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7890450) as phase spec initialization. But sadly it didn't work.
 
-Here is the config and train script of different settings, `diff <train-script> <train-script>` to see the differences.
-
-| Model | Config File | Train Script | 
-| --- | ---| ---|
-|APNet2|config.json|train.py|
-|APNet2 w/pghi|config_pghi.json|train_pghi.py|
-|FreeV | config2.json|train2.py|
-|FreeV w/pghi| config2_pghi.json|train2_pghi.py|
+| Model         | Config File       | Train Script  | 
+| ------------- | ----------------- | ------------- |
+| APNet2        | config.json       |train.py       |
+| APNet2 w/pghi | config_pghi.json  |train_pghi.py  |
+| FreeV         | config2.json      |train2.py      |
+| FreeV w/pghi  | config2_pghi.json |train2_pghi.py |
 
 ## Training
 **Model checkpoints** and **tensorboard training logs** available at: [huggingface](https://huggingface.co/Bakerbunker/FreeV_Model_Logs)
